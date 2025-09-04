@@ -1,0 +1,35 @@
+--- 
+- name: Set up podman machine on WSL2
+  hosts: localhost
+
+  tasks:
+    - name: Update and upgrade
+      become: true
+      apt:
+        upgrade: full
+        update_cache: true
+
+    - name: install packages
+      become: true
+      apt:
+        name: neovim
+
+    - name: Cycle bash completion with TAB
+      blockinfile:
+        block: |
+          set editing-mode vi
+
+          set keymap vi-command
+          "\C-l": clear-screen
+
+          set keymap vi-insert
+          "\C-l": clear-screen
+          TAB: menu-complete
+          "\e[Z": menu-complete-backward
+          set show-all-if-ambiguous on
+          set menu-complete-display-prefix on
+        dest: ~/.inputrc
+        create: true
+
+    - name: git set up
+      shell: git config --global init.defaultBranch main
