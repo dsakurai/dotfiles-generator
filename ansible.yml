@@ -17,6 +17,17 @@
           - tmux
           - ranger
 
+    - name: Set editor
+      shell: update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 100
+      become: true
+
+    - name: Set editor env var
+      become: true
+      copy:
+        content: |
+          export EDITOR="/usr/bin/nvim"
+        dest: /etc/profile.d/editor.sh
+
     - name: Cycle bash completion with TAB
       blockinfile:
         block: |
@@ -55,5 +66,9 @@
           bind j select-pane -D
           bind k select-pane -U
           bind l select-pane -R
+
+          # Display working directory
+          set -g status-left "#{pane_current_path}"
+          set -g status-left-length 85 # Longer status pane
         dest: ~/.tmux.conf
         create: true
