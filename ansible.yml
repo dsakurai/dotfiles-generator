@@ -15,6 +15,7 @@
         name: 
           - neovim 
           - tmux
+          - ranger
 
     - name: Cycle bash completion with TAB
       blockinfile:
