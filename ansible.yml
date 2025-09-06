@@ -35,6 +35,11 @@
 
     - name: git set up
       shell: git config --global init.defaultBranch main
+    - name: git alias
+      git_config:
+        scope: global
+        name: alias.log-graph
+        value: log --graph
     
     - name: Edit tmux settings
       blockinfile:
