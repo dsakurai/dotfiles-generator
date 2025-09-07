@@ -13,8 +13,13 @@
       apt:
         name: 
           - neovim 
-          - tmux
           - ranger
+          - tmux
+          - build-essential      # gcc, g++, make
+          - pkg-config
+          - libssl-dev
+          - perl                 # needed when vendoring OpenSSL
+      tags: zellij
 
     - name: Set editor
       shell: update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 100
@@ -26,6 +31,44 @@
         content: |
           export EDITOR="/usr/bin/nvim"
         dest: /etc/profile.d/editor.sh
+
+    - name: Cargo and zellij
+      vars:
+        cargo_bin:  "~/.cargo/bin/cargo"
+        rustup_bin: "~/.cargo/bin/rustup"
+
+      block:
+        - name: Ensure rustup
+          shell: |
+            if [ ! -x "{{ rustup_bin }}" ]; then
+              curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain stable
+            fi
+          args:
+            creates: "{{ rustup_bin }}"
+
+        - name: Update toolchain
+          command: "{{ rustup_bin }} update stable"
+
+        - name: Install latest Zellij
+          community.general.cargo:
+            name: zellij
+            state: latest
+            executable: "{{ cargo_bin }}"
+          environment:
+            OPENSSL_NO_VENDOR: "1" # force link to system libssl
+
+        - name: Ensure the default Apache port is 8080
+          ansible.builtin.lineinfile:
+            path: ~/.bashrc
+            line:    'export PATH="${HOME}/.cargo/bin:${PATH}"'
+
+        - name: open yml / yaml in nvim
+          tags: ranger
+          blockinfile:
+            path: "~/.config/zellij/config.kdl"
+            block: |
+              theme "catppuccin-latte"
+            create: true
 
     - name: ensure rifle.conf exists
       tags: rifle
@@ -58,7 +101,6 @@
           vim.keymap.set("v", "<S-Tab>", "<gv")
 
     - name: Cycle bash completion with TAB
-      tags: tmux
       blockinfile:
         block: |
           set editing-mode vi
@@ -72,9 +114,6 @@
           "\e[Z": menu-complete-backward
           set show-all-if-ambiguous on
           set menu-complete-display-prefix on
-
-          bind -Tcopy-mode-vi DoubleClick1Pane select-word
-          bind -Tcopy-mode-vi TripleClick1Pane select-line
         dest: ~/.inputrc
         create: true
 
@@ -85,35 +124,5 @@
         scope: global
         name: alias.log-graph
         value: log --graph
-    
-    - name: Edit tmux settings
-      tags: tmux
-      blockinfile:
-        block: |
-          set -g mouse on
-          # Open the current directory when splitting a window
-          bind '"' split-window -v -c "#{pane_current_path}"
-          bind % split-window -h -c "#{pane_current_path}"
-
-          # Use vim bindings to navigate in windows
-          bind h select-pane -L
-          bind j select-pane -D
-          bind k select-pane -U
-          bind l select-pane -R
-
-          # Display working directory
-          set -g status-left "#{pane_current_path}"
-          set -g status-left-length 85 # Longer status pane
-
-          # Use vi mode for selection
-          setw -g mode-keys vi
-          # Update default binding of `Enter` to also use copy-pipe
-          bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-no-clear
-          bind-key -T copy-mode-vi v                 send      -X begin-selection
-          bind-key -T copy-mode-vi y                 send      -X copy-selection-no-clear
-          bind-key -T copy-mode-vi Enter             send      -X copy-selection-no-clear # To immediately exit: use copy-selection-and-cancel
-
-        dest: ~/.tmux.conf
-        create: true
 
 
