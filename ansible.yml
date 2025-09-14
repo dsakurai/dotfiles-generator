@@ -1,5 +1,5 @@
 --- 
-- name: Set up podman machine on WSL2
+- name: Set up an Ubuntu instance
   hosts: localhost
   tasks:
     - name: Update and upgrade
@@ -32,43 +32,12 @@
           export EDITOR="/usr/bin/nvim"
         dest: /etc/profile.d/editor.sh
 
-    - name: Cargo and zellij
-      vars:
-        cargo_bin:  "~/.cargo/bin/cargo"
-        rustup_bin: "~/.cargo/bin/rustup"
-
-      block:
-        - name: Ensure rustup
-          shell: |
-            if [ ! -x "{{ rustup_bin }}" ]; then
-              curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain stable
-            fi
-          args:
-            creates: "{{ rustup_bin }}"
-
-        - name: Update toolchain
-          command: "{{ rustup_bin }} update stable"
-
-        - name: Install latest Zellij
-          community.general.cargo:
-            name: zellij
-            state: latest
-            executable: "{{ cargo_bin }}"
-          environment:
-            OPENSSL_NO_VENDOR: "1" # force link to system libssl
-
-        - name: Ensure the default Apache port is 8080
-          ansible.builtin.lineinfile:
-            path: ~/.bashrc
-            line:    'export PATH="${HOME}/.cargo/bin:${PATH}"'
-
-        - name: open yml / yaml in nvim
-          tags: ranger
-          blockinfile:
-            path: "~/.config/zellij/config.kdl"
-            block: |
-              theme "catppuccin-latte"
-            create: true
+    - name: ensure ranger config directory exists
+      tags: rifle
+      file:
+        path: "{{ lookup('env','HOME') }}/.config/ranger"
+        state: directory
+        mode: '0755'
 
     - name: ensure rifle.conf exists
       tags: rifle
@@ -125,4 +94,42 @@
         name: alias.log-graph
         value: log --graph
 
+
+    - name: Cargo and zellij
+      vars:
+        cargo_bin:  "~/.cargo/bin/cargo"
+        rustup_bin: "~/.cargo/bin/rustup"
+
+      block:
+        - name: Ensure rustup
+          shell: |
+            if [ ! -x "{{ rustup_bin }}" ]; then
+              curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain stable
+            fi
+          args:
+            creates: "{{ rustup_bin }}"
+
+        - name: Update toolchain
+          command: "{{ rustup_bin }} update stable"
+
+        - name: Install latest Zellij
+          community.general.cargo:
+            name: zellij
+            state: latest
+            executable: "{{ cargo_bin }}"
+          environment:
+            OPENSSL_NO_VENDOR: "1" # force link to system libssl
+
+        - name: Ensure the default Apache port is 8080
+          ansible.builtin.lineinfile:
+            path: ~/.bashrc
+            line:    'export PATH="${HOME}/.cargo/bin:${PATH}"'
+
+        - name: open yml / yaml in nvim
+          tags: ranger
+          blockinfile:
+            path: "~/.config/zellij/config.kdl"
+            block: |
+              theme "catppuccin-latte"
+            create: true
 
