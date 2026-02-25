@@ -1,0 +1,3 @@
+[submodule "ansible_collections/dsakurai/common"]
+	path = ansible_collections/dsakurai/common
+	url = git@github.com:dsakurai/ansible-collection-common.git

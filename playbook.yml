@@ -1,0 +1,23 @@
+---
+- name: Set up WSL2
+  hosts: localhost
+
+  collections:
+    - dsakurai.common
+
+  tasks:
+    - name: Install git
+      become: true
+      ansible.builtin.apt:
+        name: git
+        state: present
+
+    - name: Run collection dsakurai.common
+      block:
+        - include_role:
+            name: apt-update
+        - include_role:
+            name: generic
+        - include_role:
+            name: zellij # Slow
+

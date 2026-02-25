@@ -12,5 +12,9 @@ sudo apt install -y ansible git locales
 echo "en_US.UTF-8 UTF-8" | sudo tee -a /etc/locale.gen
 sudo locale-gen 
 
+if [ -z "$(ls -A ./ansible_collections/dsakurai/common)" ]; then
+    git submodule update --init --recursive
+fi
+
 # Run the Ansible playbook
-ansible-playbook -i inventory.ini ansible.yml
+ansible-playbook -i inventory.ini playbook.yml
