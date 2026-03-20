@@ -15,7 +15,7 @@ This will ask a few questions on the output directory and setting values.
 
 ## Demo
 
-The following command will generate the default settings in this project's root directory.
+The following command will generate the default settings in the [`demo`](demo) directory.
 ```
 ./generate-vscode-settings.sh -d
 ```

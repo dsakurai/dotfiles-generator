@@ -7,9 +7,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 
-# Check for -m flag
+# Check for flag
 if [[ "${1:-}" == "-d" ]]; then
-  OUTPUT_DIR="$SCRIPT_DIR"
+  OUTPUT_DIR="$SCRIPT_DIR/demo"
   NVIM_EXE=""
 fi
 
