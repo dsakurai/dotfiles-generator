@@ -23,7 +23,7 @@ This will ask a few questions on the output directory and setting values.
 
 The following command will generate the default settings in the [`demo`](demo) directory.
 ```
-./generate-vscode-settings.sh -d
+./generate-vscode-settings.py -d
 ```
 
 ## Maintenance
