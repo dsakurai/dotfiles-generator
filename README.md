@@ -14,7 +14,7 @@ Optionally, if you have existing settings directory that is inaccessible from th
 
 Run the following:
 ```
-./generate-vscode-settings.py
+./generate-vscode-settings.rb
 ```
 
 This will ask a few questions on the output directory and setting values.
@@ -23,13 +23,13 @@ This will ask a few questions on the output directory and setting values.
 
 The following command will generate the default settings in the [`demo`](demo) directory.
 ```
-./generate-vscode-settings.py -d
+./generate-vscode-settings.rb -d
 ```
 
 ## Maintenance
 
 Run 
 ```
-./generate-vscode-settings.py -d
+./generate-vscode-settings.rb -d
 ```
 and add the generated settings file in git.

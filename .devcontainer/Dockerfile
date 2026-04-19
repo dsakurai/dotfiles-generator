@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # For Ansible
     ansible \
+    ruby \
     # For getopt
     util-linux \
     && rm -rf /var/lib/apt/lists/*
